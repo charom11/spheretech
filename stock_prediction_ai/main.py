@@ -40,7 +40,7 @@ def train_lstm(model, X_train, y_train, X_val, y_val, epochs=30, lr=0.001):
 
 def main():
     # Select asset: 'AAPL', 'BTC-USD', or 'ETH-USD'
-    asset = 'AAPL'  # Change to 'BTC-USD' or 'ETH-USD' as needed
+    asset = 'BTC-USD'  # Change to 'AAPL' or 'ETH-USD' as needed
     data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
     # Fetch data if not present
     if not os.path.exists(data_file):
