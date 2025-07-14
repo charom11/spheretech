@@ -89,6 +89,7 @@ def main():
     plt.legend()
     plt.tight_layout()
     plot_path = f'stock_prediction_ai/data/lstm_pred_vs_actual_{asset.lower().replace("-usd", "")}.png'
+    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     plt.savefig(plot_path)
     print(f'Plot saved to {plot_path}')
     plt.close()
