@@ -11,6 +11,15 @@ def extract_features(data_path):
         features (pd.DataFrame): Stock data with technical indicators.
     """
     df = pd.read_csv(data_path)
+    # Drop the first two rows if they are non-numeric headers
+    df = df.drop([0, 1]).reset_index(drop=True)
+    # Convert all columns except Date to numeric
+    for col in df.columns:
+        if col != 'Price' and col != 'Date':
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    # Rename columns for consistency if needed
+    if 'Close' not in df.columns and 'Price' in df.columns:
+        df = df.rename(columns={'Price': 'Close'})
     df['MA_5'] = df['Close'].rolling(window=5).mean()
     df['MA_10'] = df['Close'].rolling(window=10).mean()
     # RSI
