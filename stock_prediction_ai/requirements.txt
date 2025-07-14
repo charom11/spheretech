@@ -5,8 +5,9 @@ matplotlib
 seaborn
 torch
 torchvision
-tensorflow
-keras
+# tensorflow and keras are not compatible with Python 3.13 as of early 2024
+# tensorflow
+# keras
 scipy
 xgboost
 bayesian-optimization
