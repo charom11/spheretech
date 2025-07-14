@@ -33,4 +33,12 @@ def extract_features(data_path):
     ema26 = df['Close'].ewm(span=26, adjust=False).mean()
     df['MACD'] = ema12 - ema26
     df['MACD_signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+    # EMA20, EMA50
+    df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
+    df['EMA_50'] = df['Close'].ewm(span=50, adjust=False).mean()
+    # Bollinger Bands
+    df['BB_MID'] = df['Close'].rolling(window=20).mean()
+    df['BB_UPPER'] = df['BB_MID'] + 2 * df['Close'].rolling(window=20).std()
+    df['BB_LOWER'] = df['BB_MID'] - 2 * df['Close'].rolling(window=20).std()
+    # Volume is already present
     return df

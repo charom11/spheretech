@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime, timedelta
 import pandas as pd
+import time
 
 
 def prepare_lstm_data(df, feature_cols, target_col, seq_len=10):
@@ -75,7 +76,8 @@ def main():
     print('High-Level Features (after denoising):')
     print(high_level_features.head())
 
-    feature_cols = ['Close', 'MA_5', 'MA_10', 'RSI_14', 'MACD', 'MACD_signal']
+    # Use new features
+    feature_cols = ['Close', 'MA_5', 'MA_10', 'RSI_14', 'MACD', 'MACD_signal', 'EMA_20', 'EMA_50', 'BB_MID', 'BB_UPPER', 'BB_LOWER', 'Volume']
     target_col = 'Close'
     high_level_features = high_level_features.dropna()
 
@@ -100,12 +102,44 @@ def main():
     split = int(0.8 * len(X_tensor))
     X_train, X_val = X_tensor[:split], X_tensor[split:]
     y_train, y_val = y_tensor[:split], y_tensor[split:]
+    # Use deeper, bidirectional LSTM
     input_size = X.shape[2]
-    hidden_size = 64
-    num_layers = 2
+    hidden_size = 128
+    num_layers = 3
     output_size = 1
-    lstm_model = LSTMModel(input_size, hidden_size, num_layers, output_size)
-    lstm_model = train_lstm(lstm_model, X_train, y_train, X_val, y_val, epochs=100)
+    lstm_model = LSTMModel(input_size, hidden_size, num_layers, output_size, bidirectional=True)
+    # Early stopping logic
+    start_time = time.time()
+    best_val_loss = float('inf')
+    patience = 10
+    patience_counter = 0
+    max_minutes = 5
+    epochs = 1000
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(lstm_model.parameters(), lr=0.001)
+    for epoch in range(epochs):
+        lstm_model.train()
+        optimizer.zero_grad()
+        output = lstm_model(X_train)
+        loss = criterion(output.squeeze(), y_train)
+        loss.backward()
+        optimizer.step()
+        if epoch % 10 == 0 or epoch == epochs-1:
+            lstm_model.eval()
+            val_output = lstm_model(X_val)
+            val_loss = criterion(val_output.squeeze(), y_val)
+            print(f"Epoch {epoch}, Train Loss: {loss.item():.4f}, Val Loss: {val_loss.item():.4f}")
+            if val_loss.item() < best_val_loss:
+                best_val_loss = val_loss.item()
+                patience_counter = 0
+            else:
+                patience_counter += 1
+            if patience_counter >= patience:
+                print(f"Early stopping at epoch {epoch}")
+                break
+        if (time.time() - start_time) > max_minutes * 60:
+            print(f"Stopped training after {max_minutes} minutes at epoch {epoch}")
+            break
     with torch.no_grad():
         preds_scaled = lstm_model(X_val).squeeze().numpy()
     # Inverse transform predictions and actuals
