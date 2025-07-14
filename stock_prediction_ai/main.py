@@ -45,8 +45,10 @@ def main():
     # Use extended BTC data if asset is BTC-USD
     if asset == 'BTC-USD':
         data_file = 'stock_prediction_ai/data/btc_2021_2025.csv'
+        plot_path = 'stock_prediction_ai/data/lstm_pred_vs_actual_btc_2021_2025.png'
     else:
         data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
+        plot_path = f'stock_prediction_ai/data/lstm_pred_vs_actual_{asset.lower().replace("-usd", "")}.png'
     # Fetch data if not present
     if not os.path.exists(data_file):
         fetch_and_save_stock_data(asset, '2024-01-01', '2024-07-01', data_file)
@@ -92,7 +94,6 @@ def main():
     plt.ylabel('Price')
     plt.legend()
     plt.tight_layout()
-    plot_path = f'stock_prediction_ai/data/lstm_pred_vs_actual_{asset.lower().replace("-usd", "")}.png'
     os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     plt.savefig(plot_path)
     print(f'Plot saved to {plot_path}')
