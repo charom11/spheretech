@@ -1,11 +1,27 @@
 import pandas as pd
+import numpy as np
+
 
 def extract_features(data_path):
     """
-    Loads stock data from CSV and returns as DataFrame (placeholder for feature extraction).
+    Loads stock data from CSV, adds technical indicators, and returns as DataFrame.
     Args:
         data_path (str): Path to the stock data CSV file.
     Returns:
-        features (pd.DataFrame): Loaded stock data.
+        features (pd.DataFrame): Stock data with technical indicators.
     """
-    return pd.read_csv(data_path)
+    df = pd.read_csv(data_path)
+    df['MA_5'] = df['Close'].rolling(window=5).mean()
+    df['MA_10'] = df['Close'].rolling(window=10).mean()
+    # RSI
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    rs = gain / (loss + 1e-9)
+    df['RSI_14'] = 100 - (100 / (1 + rs))
+    # MACD
+    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
+    df['MACD'] = ema12 - ema26
+    df['MACD_signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+    return df

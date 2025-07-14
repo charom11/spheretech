@@ -13,3 +13,4 @@ xgboost
 bayesian-optimization
 gym
 stable-baselines3
+yfinance
