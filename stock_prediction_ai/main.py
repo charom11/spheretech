@@ -10,6 +10,8 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+from datetime import datetime, timedelta
+import pandas as pd
 
 
 def prepare_lstm_data(df, feature_cols, target_col, seq_len=10):
@@ -130,8 +132,16 @@ def main():
     future_preds = predict_future(lstm_model, last_seq, n_future, scaler_y)
     print(f'Next {n_future} predicted prices for BTC:')
     print(future_preds)
-    # Save future predictions
-    np.savetxt('stock_prediction_ai/data/btc_future_pred_2021_2025.csv', future_preds, delimiter=',', header='Predicted_Close', comments='')
+    # Save future predictions with dates
+    # Get last date from the first column (after dropping extra headers)
+    last_date_str = high_level_features.iloc[-1, 0]
+    try:
+        last_date = datetime.strptime(str(last_date_str), '%Y-%m-%d')
+    except Exception:
+        last_date = pd.to_datetime(last_date_str)
+    future_dates = [(last_date + timedelta(days=i+1)).strftime('%Y-%m-%d') for i in range(n_future)]
+    future_df = pd.DataFrame({'Date': future_dates, 'Predicted_Close': future_preds})
+    future_df.to_csv('stock_prediction_ai/data/btc_future_pred_2021_2025.csv', index=False)
 
     # 3. GAN Training (placeholder)
     best_gan_params = optimize_hyperparams(high_level_features)
