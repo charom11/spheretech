@@ -42,7 +42,11 @@ def train_lstm(model, X_train, y_train, X_val, y_val, epochs=30, lr=0.001):
 def main():
     # Select asset: 'AAPL', 'BTC-USD', or 'ETH-USD'
     asset = 'BTC-USD'  # Change to 'AAPL' or 'ETH-USD' as needed
-    data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
+    # Use extended BTC data if asset is BTC-USD
+    if asset == 'BTC-USD':
+        data_file = 'stock_prediction_ai/data/btc_2021_2025.csv'
+    else:
+        data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
     # Fetch data if not present
     if not os.path.exists(data_file):
         fetch_and_save_stock_data(asset, '2024-01-01', '2024-07-01', data_file)
