@@ -8,6 +8,7 @@ from utils.fetch_data import fetch_and_save_stock_data
 import torch
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 
 def prepare_lstm_data(df, feature_cols, target_col, seq_len=10):
@@ -77,6 +78,17 @@ def main():
         preds = lstm_model(X_val)
     print('LSTM Predictions (first 5):')
     print(preds[:5].squeeze().numpy())
+
+    # Visualize predictions vs. actual
+    plt.figure(figsize=(12, 6))
+    plt.plot(y_val.numpy(), label='Actual')
+    plt.plot(preds.squeeze().numpy(), label='Predicted')
+    plt.title(f'LSTM Predictions vs. Actual ({asset})')
+    plt.xlabel('Time Step')
+    plt.ylabel('Price')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
     # 3. GAN Training (placeholder)
     best_gan_params = optimize_hyperparams(high_level_features)
