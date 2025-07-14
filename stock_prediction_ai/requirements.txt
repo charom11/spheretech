@@ -5,21 +5,12 @@ matplotlib
 seaborn
 torch
 torchvision
-<<<<<<< HEAD
-tensorflow
-keras
-=======
 # tensorflow and keras are not compatible with Python 3.13 as of early 2024
 # tensorflow
 # keras
->>>>>>> cursor/create-new-item-fa22
 scipy
 xgboost
 bayesian-optimization
 gym
-<<<<<<< HEAD
-stable-baselines3
-=======
 stable-baselines3
 yfinance
->>>>>>> cursor/create-new-item-fa22

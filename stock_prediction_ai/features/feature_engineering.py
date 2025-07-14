@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-def extract_features(data_path):
-    """
-    Placeholder for feature extraction logic.
-    Args:
-        data_path (str): Path to the stock data CSV file.
-    Returns:
-        features (object): Extracted features (to be defined).
-    """
-    # TODO: Implement feature extraction
-    return None
-=======
 import pandas as pd
 import numpy as np
 
@@ -46,4 +34,3 @@ def extract_features(data_path):
     df['MACD'] = ema12 - ema26
     df['MACD_signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
     return df
->>>>>>> cursor/create-new-item-fa22
