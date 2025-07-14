@@ -88,7 +88,10 @@ def main():
     plt.ylabel('Price')
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    plot_path = f'stock_prediction_ai/data/lstm_pred_vs_actual_{asset.lower().replace("-usd", "")}.png'
+    plt.savefig(plot_path)
+    print(f'Plot saved to {plot_path}')
+    plt.close()
 
     # 3. GAN Training (placeholder)
     best_gan_params = optimize_hyperparams(high_level_features)
