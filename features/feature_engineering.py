@@ -10,16 +10,35 @@ def extract_features(data_path):
     Returns:
         features (pd.DataFrame): Stock data with technical indicators.
     """
-    df = pd.read_csv(data_path)
-    # Drop the first two rows if they are non-numeric headers
-    df = df.drop([0, 1]).reset_index(drop=True)
+    if data_path.endswith('Bitcoin_1_1_2008-7_15_2025_historical_data_coinmarketcap.csv'):
+        df = pd.read_csv(data_path, delimiter=';')
+        # Rename columns to match expected names
+        df = df.rename(columns={
+            'timeOpen': 'Date',
+            'open': 'Open',
+            'high': 'High',
+            'low': 'Low',
+            'close': 'Close',
+            'volume': 'Volume'
+        })
+        # Only keep necessary columns
+        df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']]
+    else:
+        df = pd.read_csv(data_path)
+    print("Columns after loading:", df.columns.tolist())
+    # Rename 'Open Time' to 'Date' for Binance CSV compatibility
+    if 'Open Time' in df.columns and 'Date' not in df.columns:
+        df = df.rename(columns={'Open Time': 'Date'})
+    print("Columns after loading and renaming:", df.columns.tolist())
     # Convert all columns except Date to numeric
     for col in df.columns:
-        if col != 'Price' and col != 'Date':
+        if col != 'Date':
             df[col] = pd.to_numeric(df[col], errors='coerce')
-    # Rename columns for consistency if needed
+    # Ensure 'Close' column exists for technical indicators
     if 'Close' not in df.columns and 'Price' in df.columns:
         df = df.rename(columns={'Price': 'Close'})
+    df['Close'] = pd.Series(df['Close'])
+    # Technical indicators are calculated below on DataFrame columns only
     df['MA_5'] = df['Close'].rolling(window=5).mean()
     df['MA_10'] = df['Close'].rolling(window=10).mean()
     # RSI
