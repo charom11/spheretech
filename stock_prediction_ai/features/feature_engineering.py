@@ -10,12 +10,21 @@ def extract_features(data_path):
     Returns:
         features (pd.DataFrame): Stock data with technical indicators.
     """
-    df = pd.read_csv(data_path)
-    # Drop the first two rows if they are non-numeric headers
-    df = df.drop([0, 1]).reset_index(drop=True)
+    df = pd.read_csv(data_path, sep=';')
+    df = df.iloc[::-1].reset_index(drop=True)
+    # Rename columns for consistency with expected names
+    rename_map = {
+        'close': 'Close',
+        'open': 'Open',
+        'high': 'High',
+        'low': 'Low',
+        'volume': 'Volume',
+        'timeOpen': 'Date',
+    }
+    df = df.rename(columns=rename_map)
     # Convert all columns except Date to numeric
     for col in df.columns:
-        if col != 'Price' and col != 'Date':
+        if col not in ['Date', 'name', 'timestamp']:
             df[col] = pd.to_numeric(df[col], errors='coerce')
     # Rename columns for consistency if needed
     if 'Close' not in df.columns and 'Price' in df.columns:

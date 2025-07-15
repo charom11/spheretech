@@ -79,7 +79,9 @@ def main():
     # Use new features
     feature_cols = ['Close', 'MA_5', 'MA_10', 'RSI_14', 'MACD', 'MACD_signal', 'EMA_20', 'EMA_50', 'BB_MID', 'BB_UPPER', 'BB_LOWER', 'Volume']
     target_col = 'Close'
-    high_level_features = high_level_features.dropna()
+    high_level_features = high_level_features.dropna(subset=feature_cols + [target_col])
+    print('Shape after dropna:', high_level_features.shape)
+    print(high_level_features.head())
 
     # Scale features and target
     scaler_X = MinMaxScaler()
