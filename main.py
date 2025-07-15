@@ -13,6 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime, timedelta
 import pandas as pd
 import time
+import sys
 
 
 def prepare_lstm_data(df, feature_cols, target_col, seq_len=10):
@@ -60,13 +61,15 @@ def predict_future(model, last_seq, n_steps, scaler_y):
 
 
 def main():
-    asset = 'BTC-USD'
-    if asset == 'BTC-USD':
+    # Accept CSV file path as argument
+    if len(sys.argv) > 1:
+        data_file = sys.argv[1]
+        asset = 'BTC-USD'  # or infer from filename if needed
+        plot_path = os.path.splitext(data_file)[0] + '_lstm_pred_vs_actual.png'
+    else:
+        asset = 'BTC-USD'
         data_file = 'stock_prediction_ai/data/Bitcoin_1_1_2008-7_15_2025_historical_data_coinmarketcap.csv'
         plot_path = 'stock_prediction_ai/data/lstm_pred_vs_actual_btc_2021_2025.png'
-    else:
-        data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
-        plot_path = f'stock_prediction_ai/data/lstm_pred_vs_actual_{asset.lower().replace("-usd", "")}.png'
     if not os.path.exists(data_file):
         fetch_and_save_stock_data(asset, '2024-01-01', '2024-07-01', data_file)
     features = extract_features(data_file)
@@ -167,7 +170,6 @@ def main():
     print(f'Next {n_future} predicted prices for BTC:')
     print(future_preds)
     # Save future predictions with dates
-    # Get last date from the first column (after dropping extra headers)
     last_date_str = high_level_features.iloc[-1, 0]
     try:
         last_date = datetime.strptime(str(last_date_str), '%Y-%m-%d')
@@ -175,7 +177,13 @@ def main():
         last_date = pd.to_datetime(last_date_str)
     future_dates = [(last_date + timedelta(days=i+1)).strftime('%Y-%m-%d') for i in range(n_future)]
     future_df = pd.DataFrame({'Date': future_dates, 'Predicted_Close': future_preds})
-    future_df.to_csv('stock_prediction_ai/data/btc_future_pred_2021_2025.csv', index=False)
+    future_df.to_csv(os.path.splitext(data_file)[0] + '_future_pred.csv', index=False)
+    # Print actual vs. predicted for future (if actuals available)
+    if len(high_level_features) >= n_future:
+        actual_future = high_level_features[target_col].values[-n_future:]
+        print('Date       | Actual      | Predicted')
+        for d, a, p in zip(future_dates, actual_future, future_preds):
+            print(f'{d} | {a:.2f} | {p:.2f}')
 
     # 3. GAN Training (placeholder)
     best_gan_params = optimize_hyperparams(high_level_features)
