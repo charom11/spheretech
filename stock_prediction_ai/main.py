@@ -62,7 +62,7 @@ def predict_future(model, last_seq, n_steps, scaler_y):
 def main():
     asset = 'BTC-USD'
     if asset == 'BTC-USD':
-        data_file = 'stock_prediction_ai/data/btc_2021_2025.csv'
+        data_file = 'stock_prediction_ai/data/Bitcoin_1_1_2008-7_15_2025_historical_data_coinmarketcap.csv'
         plot_path = 'stock_prediction_ai/data/lstm_pred_vs_actual_btc_2021_2025.png'
     else:
         data_file = f'stock_prediction_ai/data/{asset.lower().replace("-usd", "")}_2024.csv'
